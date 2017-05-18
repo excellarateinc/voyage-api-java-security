@@ -72,11 +72,12 @@ repositories {
 // - RELEASE: Versions with the "-RELEASE" appended (ie 1.0.0-RELEASE) will be deployed to the mavenRepoReleaseUrl
 uploadArchives {
     repositories {
+        //noinspection GroovyAssignabilityCheck
         mavenDeployer {
-            repository(url: mavenRepoSnapshotUrl) {
+            repository(url: mavenRepoReleaseUrl) {
                 authentication(userName: mavenRepoUsername, password: mavenRepoPassword)
             }
-            snapshotRepository(url: mavenRepoReleaseUrl) {
+            snapshotRepository(url: mavenRepoSnapshotUrl) {
                 authentication(userName: mavenRepoUsername, password: mavenRepoPassword)
             }
         }
