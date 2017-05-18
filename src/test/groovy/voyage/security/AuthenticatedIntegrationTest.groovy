@@ -26,9 +26,10 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import spock.lang.Specification
+import voyage.AbstractIntegrationTest
 
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-class AuthenticatedIntegrationTest extends Specification {
+class AuthenticatedIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     protected SuperClient superClient
 
