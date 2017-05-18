@@ -16,7 +16,9 @@
 package voyage.security
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.embedded.LocalServerPort
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -26,15 +28,20 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import spock.lang.Specification
-import voyage.AbstractIntegrationTest
 
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-class AuthenticatedIntegrationTest extends AbstractIntegrationTest {
+class AuthenticatedIntegrationTest extends Specification {
     @Autowired
     protected SuperClient superClient
 
     @Autowired
     protected StandardClient standardClient
+
+    @Autowired
+    protected TestRestTemplate restTemplate
+
+    @LocalServerPort
+    protected int httpPort
 
     def setup() {
         SecurityContextHolder.setContext(new TestSecurityContext())
