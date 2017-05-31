@@ -37,7 +37,7 @@ class UserServiceSpec extends Specification {
                 username:'username', firstName:'LSS', lastName:'India', password:'Test&1234', isVerifyRequired:false,
                 isEnabled:false, isAccountExpired:false, isAccountLocked:false, isCredentialsExpired:false,
         )
-        user.phones = [new UserPhone(phoneNumber:' 16518886020', phoneType:PhoneType.MOBILE)]
+        user.phones = [new UserPhone(phoneNumber:'+16518886020', phoneType:PhoneType.MOBILE)]
         modifiedUser = new User(username:'username', firstName:'LSS', lastName:'Inc')
         validPassword = new RuleResult(true)
         invalidPassword = new RuleResult(false)
@@ -208,11 +208,11 @@ class UserServiceSpec extends Specification {
                     password:'Test&1234',
             )
             userIn.phones = []
-            userIn.phones.add(new UserPhone(phoneType:PhoneType.MOBILE, phoneNumber:' 1-651-888-6021'))
-            userIn.phones.add(new UserPhone(phoneType:PhoneType.HOME, phoneNumber:' 1-651-888-6022'))
-            userIn.phones.add(new UserPhone(phoneType:PhoneType.MOBILE, phoneNumber:' 1-651-888-6023'))
-            userIn.phones.add(new UserPhone(phoneType:PhoneType.OFFICE, phoneNumber:' 1-651-888-6024'))
-            userIn.phones.add(new UserPhone(phoneType:PhoneType.OTHER, phoneNumber:' 1-651-888-6025'))
+            userIn.phones.add(new UserPhone(phoneType:PhoneType.MOBILE, phoneNumber:'+1-651-888-6021'))
+            userIn.phones.add(new UserPhone(phoneType:PhoneType.HOME, phoneNumber:'+1-651-888-6022'))
+            userIn.phones.add(new UserPhone(phoneType:PhoneType.MOBILE, phoneNumber:'+1-651-888-6023'))
+            userIn.phones.add(new UserPhone(phoneType:PhoneType.OFFICE, phoneNumber:'+1-651-888-6024'))
+            userIn.phones.add(new UserPhone(phoneType:PhoneType.OTHER, phoneNumber:'+1-651-888-6025'))
         when:
             User updatedUser = userService.saveDetached(userIn)
         then:
@@ -223,17 +223,17 @@ class UserServiceSpec extends Specification {
             updatedUser.firstName == 'FIRST'
             updatedUser.lastName == 'LAST'
             updatedUser.phones.size() == 6
-            updatedUser.phones[0].phoneNumber == ' 16518886020'
+            updatedUser.phones[0].phoneNumber == '+16518886020'
             updatedUser.phones[0].phoneType == PhoneType.MOBILE
-            updatedUser.phones[1].phoneNumber == ' 16518886021'
+            updatedUser.phones[1].phoneNumber == '+16518886021'
             updatedUser.phones[1].phoneType == PhoneType.MOBILE
-            updatedUser.phones[2].phoneNumber == ' 16518886022'
+            updatedUser.phones[2].phoneNumber == '+16518886022'
             updatedUser.phones[2].phoneType == PhoneType.HOME
-            updatedUser.phones[3].phoneNumber == ' 16518886023'
+            updatedUser.phones[3].phoneNumber == '+16518886023'
             updatedUser.phones[3].phoneType == PhoneType.MOBILE
-            updatedUser.phones[4].phoneNumber == ' 16518886024'
+            updatedUser.phones[4].phoneNumber == '+16518886024'
             updatedUser.phones[4].phoneType == PhoneType.OFFICE
-            updatedUser.phones[5].phoneNumber == ' 16518886025'
+            updatedUser.phones[5].phoneNumber == '+16518886025'
             updatedUser.phones[5].phoneType == PhoneType.OTHER
     }
 
@@ -267,9 +267,9 @@ class UserServiceSpec extends Specification {
         given:
             user.id = 1
             user.phones = []
-            user.phones.add(new UserPhone(id:1, phoneType:PhoneType.MOBILE, phoneNumber:' 16518886021'))
-            user.phones.add(new UserPhone(id:2, phoneType:PhoneType.MOBILE, phoneNumber:' 16518886022'))
-            user.phones.add(new UserPhone(id:3, phoneType:PhoneType.MOBILE, phoneNumber:' 16518886023'))
+            user.phones.add(new UserPhone(id:1, phoneType:PhoneType.MOBILE, phoneNumber:'+16518886021'))
+            user.phones.add(new UserPhone(id:2, phoneType:PhoneType.MOBILE, phoneNumber:'+16518886022'))
+            user.phones.add(new UserPhone(id:3, phoneType:PhoneType.MOBILE, phoneNumber:'+16518886023'))
 
             User userIn = new User(
                     id:1,
@@ -279,9 +279,9 @@ class UserServiceSpec extends Specification {
                     password:'Test&1234',
             )
             userIn.phones = []
-            userIn.phones.add(new UserPhone(id:1, phoneType:PhoneType.HOME, phoneNumber:' 16518886021'))
-            userIn.phones.add(new UserPhone(id:2, phoneType:PhoneType.HOME, phoneNumber:' 16518886022'))
-            userIn.phones.add(new UserPhone(id:3, phoneType:PhoneType.HOME, phoneNumber:' 16518886023'))
+            userIn.phones.add(new UserPhone(id:1, phoneType:PhoneType.HOME, phoneNumber:'+16518886021'))
+            userIn.phones.add(new UserPhone(id:2, phoneType:PhoneType.HOME, phoneNumber:'+16518886022'))
+            userIn.phones.add(new UserPhone(id:3, phoneType:PhoneType.HOME, phoneNumber:'+16518886023'))
 
         when:
             userService.saveDetached(userIn)
@@ -297,9 +297,9 @@ class UserServiceSpec extends Specification {
         given:
             user.id = 1
             user.phones = []
-            user.phones.add(new UserPhone(id:1, phoneType:PhoneType.MOBILE, phoneNumber:' 16518886021'))
-            user.phones.add(new UserPhone(id:2, phoneType:PhoneType.MOBILE, phoneNumber:' 16518886022'))
-            user.phones.add(new UserPhone(id:3, phoneType:PhoneType.MOBILE, phoneNumber:' 16518886023'))
+            user.phones.add(new UserPhone(id:1, phoneType:PhoneType.MOBILE, phoneNumber:'+16518886021'))
+            user.phones.add(new UserPhone(id:2, phoneType:PhoneType.MOBILE, phoneNumber:'+16518886022'))
+            user.phones.add(new UserPhone(id:3, phoneType:PhoneType.MOBILE, phoneNumber:'+16518886023'))
 
             User userIn = new User(
                     id:1,
@@ -309,9 +309,9 @@ class UserServiceSpec extends Specification {
                     password:'Test&1234',
             )
             userIn.phones = []
-            userIn.phones.add(new UserPhone(id:2, phoneType:PhoneType.MOBILE, phoneNumber:' 16128886111'))
-            userIn.phones.add(new UserPhone(phoneType:PhoneType.MOBILE, phoneNumber:' 16518886023'))
-            userIn.phones.add(new UserPhone(phoneType:PhoneType.MOBILE, phoneNumber:' 16518886024'))
+            userIn.phones.add(new UserPhone(id:2, phoneType:PhoneType.MOBILE, phoneNumber:'+16128886111'))
+            userIn.phones.add(new UserPhone(phoneType:PhoneType.MOBILE, phoneNumber:'+16518886023'))
+            userIn.phones.add(new UserPhone(phoneType:PhoneType.MOBILE, phoneNumber:'+16518886024'))
 
         when:
             User savedUser = userService.saveDetached(userIn)
@@ -323,22 +323,22 @@ class UserServiceSpec extends Specification {
             savedUser.phones.size() == 4
 
             savedUser.phones[0].id == 1
-            savedUser.phones[0].phoneNumber == ' 16518886021'
+            savedUser.phones[0].phoneNumber == '+16518886021'
             savedUser.phones[0].phoneType == PhoneType.MOBILE
             savedUser.phones[0].isDeleted
 
             savedUser.phones[1].id == 2
-            savedUser.phones[1].phoneNumber == ' 16128886111'
+            savedUser.phones[1].phoneNumber == '+16128886111'
             savedUser.phones[1].phoneType == PhoneType.MOBILE
             !savedUser.phones[1].isDeleted
 
             savedUser.phones[2].id == 3
-            savedUser.phones[2].phoneNumber == ' 16518886023'
+            savedUser.phones[2].phoneNumber == '+16518886023'
             savedUser.phones[2].phoneType == PhoneType.MOBILE
             !savedUser.phones[2].isDeleted
 
             savedUser.phones[3].id == null
-            savedUser.phones[3].phoneNumber == ' 16518886024'
+            savedUser.phones[3].phoneNumber == '+16518886024'
             savedUser.phones[3].phoneType == PhoneType.MOBILE
             !savedUser.phones[3].isDeleted
     }
