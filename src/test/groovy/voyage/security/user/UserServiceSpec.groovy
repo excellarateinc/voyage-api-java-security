@@ -17,6 +17,7 @@ package voyage.security.user
 
 import org.passay.PasswordValidator
 import org.passay.RuleResult
+import org.passay.RuleResultDetail
 import spock.lang.Specification
 import voyage.security.crypto.CryptoService
 
@@ -40,7 +41,7 @@ class UserServiceSpec extends Specification {
         user.phones = [new UserPhone(phoneNumber:'+16518886020', phoneType:PhoneType.MOBILE)]
         modifiedUser = new User(username:'username', firstName:'LSS', lastName:'Inc')
         validPassword = new RuleResult(true)
-        invalidPassword = new RuleResult(false)
+        invalidPassword = new RuleResult(false,new RuleResultDetail("1",["1":"Missing something"]))
     }
 
     def 'listAll - returns a single result' () {
@@ -379,56 +380,56 @@ class UserServiceSpec extends Specification {
             user.isDeleted
     }
     def 'update password - updating password with new password should compare passwords and saving user object'() {
-                 given:
-                    user.password = 'Efgh@5678'
-         
-                         when:
-                     userService.saveDetached(user)
-         
-                         then:
-                     cryptoService.encrypt('Test&1234' ) >> 'Test&1234'
-                         passwordValidator.validate(_) >> validPassword
-                     1 * cryptoService.hashEncode('Efgh@5678')
-                     1 * userRepository.findByUsername('username')
-                     1 * userRepository.save(user)
-             }
-     
-         def 'update password - updating password with same old password should not compare passwords '() {
-                 given:
-                     user.password = 'Test&1234'
-         
-                         when:
-                     userService.saveDetached(user)
-         
-                         then:
-                     cryptoService.encrypt('Test&1234' ) >> 'Test&1234'
-                         passwordValidator.validate(_) >> validPassword
-                     0 * cryptoService.hashEncode('Efgh@5678')
-                     1 * userRepository.findByUsername('username')
-                     1 * userRepository.save(user)
-             }
-     
-         def 'update password - updating password with null/blank value should give error'() {
-                 given:
-                     user.password = ''
+        given:
+            user.password = 'Efgh@5678'
 
-                         when:
-                     userService.saveDetached(user)
-         
-                         then:
-                         passwordValidator.validate(_) >> invalidPassword
-                     thrown(WeakPasswordException)
-             }
-     
-         def 'update password - updating password with unsatisfied string combinations  should give error'() {
-                 given:
-                     user.password = 'password'
-         
-                         when:
-                     userService.saveDetached(user)
-         
-                         then:
-                         passwordValidator.validate(_) >> invalidPassword
-                     thrown(WeakPasswordException)
-             }
+        when:
+            userService.saveDetached(user)
+
+        then:
+            cryptoService.encrypt('Test&1234' ) >> 'Test&1234'
+            passwordValidator.validate(_) >> validPassword
+            1 * cryptoService.hashEncode('Efgh@5678')
+            1 * userRepository.findByUsername('username')
+            1 * userRepository.save(user)
+    }
+
+    def 'update password - updating password with same old password should not compare passwords '() {
+        given:
+            user.password = 'Test&1234'
+
+        when:
+            userService.saveDetached(user)
+
+        then:
+            cryptoService.encrypt('Test&1234' ) >> 'Test&1234'
+            passwordValidator.validate(_) >> validPassword
+            0 * cryptoService.hashEncode('Efgh@5678')
+            1 * userRepository.findByUsername('username')
+            1 * userRepository.save(user)
+    }
+
+    def 'update password - updating password with null/blank value should give error'() {
+        given:
+            user.password = ''
+
+        when:
+            userService.saveDetached(user)
+
+        then:
+            passwordValidator.validate(_) >> invalidPassword
+            thrown(WeakPasswordException)
+    }
+
+    def 'update password - updating password with unsatisfied string combinations  should give error'() {
+        given:
+            user.password = 'password'
+
+        when:
+            userService.saveDetached(user)
+
+        then:
+            passwordValidator.validate(_) >> invalidPassword
+            thrown(WeakPasswordException)
+    }
 }
