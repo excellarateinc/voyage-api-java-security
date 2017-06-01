@@ -45,25 +45,15 @@ class PermissionController {
      * @apiName PermissionList
      * @apiGroup Permission
      *
+     * @apiDescription list all the permissions
+     *
      * @apiPermission api.permissions.list
+     *
+     * @apiSampleRequest http://voyage.com/api/v1/permissions
      *
      * @apiUse AuthHeader
      *
-     * @apiSuccess {Object[]} permissions List of permissions
-     * @apiSuccess {String} permissions.id Permission ID
-     * @apiSuccess {String} permissions.name name of the permission
-     * @apiSuccess {String} permissions.description Description
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   [
-     *       {
-     *           "id": "1",
-     *           "name": "Super User",
-     *           "description": "permission.write"
-     *       }
-     *   ]
-     *
+     * @apiUse PermissionListModel
      * @apiUse UnauthorizedError
      **/
     @GetMapping
@@ -79,7 +69,11 @@ class PermissionController {
      * @apiName PermissionCreate
      * @apiGroup Permission
      *
+     * @apiDescription Create a new permission and add it the existing list
+     *
      * @apiPermission api.permissions.create
+     *
+     * @apiSampleRequest http://voyage.com/api/v1/permissions/
      *
      * @apiUse AuthHeader
      *
@@ -109,7 +103,11 @@ class PermissionController {
      * @apiName PermissionGet
      * @apiGroup Permission
      *
+     * @apiDescription get the existing permissions based on id.
+     *
      * @apiPermission api.permissions.get
+     *
+     * @apiSampleRequest http://voyage.com/api/v1/permissions/1
      *
      * @apiUse AuthHeader
      *
@@ -117,6 +115,7 @@ class PermissionController {
      *
      * @apiUse PermissionSuccessModel
      * @apiUse UnauthorizedError
+     * @apiUse UnknownIdentifierError
      **/
     @GetMapping('/{id}')
     @PreAuthorize("hasAuthority('api.permissions.get')")
@@ -131,7 +130,11 @@ class PermissionController {
      * @apiName PermissionDelete
      * @apiGroup Permission
      *
+     * @apiDescription delete the existing permission
+     *
      * @apiPermission api.permissions.delete
+     *
+     * @apiSampleRequest http://voyage.com/api/v1/permissions/id
      *
      * @apiUse AuthHeader
      *
@@ -142,6 +145,8 @@ class PermissionController {
      *
      * @apiUse UnauthorizedError
      * @apiUse BadRequestError
+     * @apiUse UnknownIdentifierError
+     * @apiUse ImmutableRecordError
      **/
     @DeleteMapping('/{id}')
     @PreAuthorize("hasAuthority('api.permissions.delete')")
@@ -156,13 +161,26 @@ class PermissionController {
      * @apiName PermissionUpdate
      * @apiGroup Permission
      *
+     * @apiDescription Update the existing permission
+     *
      * @apiPermission api.permissions.update
      *
+     * @apiSampleRequest http://voyage.com/api/v1/permissions/id
+     *
      * @apiUse AuthHeader
+     *
+     * @apiHeader (Response Headers) {String} location Location of the updated resource
+     *
+     * @apiHeaderExample {json} Location-Example
+     * {
+     *     "Location": "http://localhost:52431/api/v1/permissions/1"
+     * }
      *
      * @apiUse PermissionRequestModel
      * @apiUse PermissionSuccessModel
      * @apiUse UnauthorizedError
+     * @apiUse UnknownIdentifierError
+     * @apiUse ImmutableRecordError
      **/
     @PutMapping('/{id}')
     @PreAuthorize("hasAuthority('api.permissions.update')")

@@ -45,25 +45,15 @@ class RoleController {
      * @apiName RoleList
      * @apiGroup Role
      *
+     * @apiDescription list all the roles
+     *
      * @apiPermission api.roles.list
+     *
+     * @apiSampleRequest http://voyage.com/api/v1/roles
      *
      * @apiUse AuthHeader
      *
-     * @apiSuccess {Object[]} roles List of roles
-     * @apiSuccess {String} roles.id Role ID
-     * @apiSuccess {String} roles.name name of the role
-     * @apiSuccess {String} roles.authority Authority
-     *
-     * @apiSuccessExample Success-Response:
-     *   HTTP/1.1 200 OK
-     *   [
-     *       {
-     *           "id": "1",
-     *           "name": "Super User",
-     *           "authority": "role.super"
-     *       }
-     *   ]
-     *
+     * @apiUse RoleListModel
      * @apiUse UnauthorizedError
      **/
     @GetMapping
@@ -79,7 +69,11 @@ class RoleController {
      * @apiName RoleCreate
      * @apiGroup Role
      *
+     * @apiDescription Create a new role and add it to the existing list
+     *
      * @apiPermission api.roles.create
+     *
+     * @apiSampleRequest http://voyage.com/api/v1/roles
      *
      * @apiUse AuthHeader
      *
@@ -109,7 +103,11 @@ class RoleController {
      * @apiName RoleGet
      * @apiGroup Role
      *
+     * @apiDescription get the existing role based on id.
+     *
      * @apiPermission api.roles.get
+     *
+     * @apiSampleRequest http://voyage.com/api/v1/roles/1
      *
      * @apiUse AuthHeader
      *
@@ -117,6 +115,7 @@ class RoleController {
      *
      * @apiUse RoleSuccessModel
      * @apiUse UnauthorizedError
+     * @apiUse UnknownIdentifierError
      **/
     @GetMapping('/{id}')
     @PreAuthorize("hasAuthority('api.roles.get')")
@@ -131,7 +130,11 @@ class RoleController {
      * @apiName RoleDelete
      * @apiGroup Role
      *
+     * @apiDescription delete role based on id.
+     *
      * @apiPermission api.roles.delete
+     *
+     * @apiSampleRequest http://voyage.com/api/v1/roles/1
      *
      * @apiUse AuthHeader
      *
@@ -156,13 +159,18 @@ class RoleController {
      * @apiName RoleUpdate
      * @apiGroup Role
      *
+     * @apiDescription update role based on id.
+     *
      * @apiPermission api.roles.update
+     *
+     * @apiSampleRequest http://voyage.com/api/v1/roles
      *
      * @apiUse AuthHeader
      *
      * @apiUse RoleRequestModel
      * @apiUse RoleSuccessModel
      * @apiUse UnauthorizedError
+     * @apiUse UnknownIdentifierError
      **/
     @PutMapping('/{id}')
     @PreAuthorize("hasAuthority('api.roles.update')")

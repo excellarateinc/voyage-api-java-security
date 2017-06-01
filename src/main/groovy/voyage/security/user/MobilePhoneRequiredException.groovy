@@ -40,6 +40,6 @@ class MobilePhoneRequiredException extends AppException {
 
     @Override
     String getErrorCode() {
-        return HTTP_STATUS.value() + '_mobile_phone_required'
+        ErrorUtils.getErrorCode(httpStatus.value(), 'mobile_phone_required')
     }
 }
