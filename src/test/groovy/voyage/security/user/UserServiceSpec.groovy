@@ -24,8 +24,8 @@ import voyage.security.crypto.CryptoService
 class UserServiceSpec extends Specification {
     User user
     User modifiedUser
-    RuleResult validPassword
-    RuleResult invalidPassword
+    RuleResult validPasswordResult
+    RuleResult invalidPasswordResult
     UserRepository userRepository = Mock()
     CryptoService cryptoService = Mock()
     PhoneService phoneService = new PhoneService()
@@ -40,11 +40,12 @@ class UserServiceSpec extends Specification {
         )
         user.phones = [new UserPhone(phoneNumber:'+16518886020', phoneType:PhoneType.MOBILE)]
         modifiedUser = new User(username:'username', firstName:'LSS', lastName:'Inc')
-        validPassword = new RuleResult(true)
-        invalidPassword = new RuleResult(false,new RuleResultDetail("1",["1":"Missing something"]))
+        validPasswordResult = new RuleResult(true)
+        invalidPasswordResult = new RuleResult(false, new RuleResultDetail('1', ['1':'Missing something']))
     }
 
     def 'listAll - returns a single result' () {
+        when:
         when:
             Iterable<User> userList = userService.listAll()
         then:
@@ -60,7 +61,7 @@ class UserServiceSpec extends Specification {
                 return args[0] // return back the given user object
             }
             cryptoService.hashEncode(user.password) >> user.password
-            passwordValidator.validate(_) >> validPassword
+            passwordValidator.validate(_) >> validPasswordResult
             savedUser.username == 'username'
             savedUser.firstName == 'LSS'
             savedUser.lastName == 'India'
@@ -79,7 +80,7 @@ class UserServiceSpec extends Specification {
         when:
             userService.saveDetached(user)
         then:
-            passwordValidator.validate(_) >> validPassword
+            passwordValidator.validate(_) >> validPasswordResult
             0 * userRepository.save(_)
 
             thrown(MobilePhoneRequiredException)
@@ -127,7 +128,7 @@ class UserServiceSpec extends Specification {
         then:
             userRepository.findOne(user.id) >> user
             userRepository.save(user) >> user
-            passwordValidator.validate(_) >> validPassword
+            passwordValidator.validate(_) >> validPasswordResult
             updatedUser.isEnabled
             updatedUser.firstName == 'FIRST'
             updatedUser.lastName == 'LAST'
@@ -220,7 +221,7 @@ class UserServiceSpec extends Specification {
             userRepository.findOne(user.id) >> user
             userRepository.save(user) >> user
             0 * cryptoService.hashEncode(_) // No password encoding
-            passwordValidator.validate(_) >> validPassword
+            passwordValidator.validate(_) >> validPasswordResult
             updatedUser.firstName == 'FIRST'
             updatedUser.lastName == 'LAST'
             updatedUser.phones.size() == 6
@@ -320,7 +321,7 @@ class UserServiceSpec extends Specification {
             userRepository.findOne(user.id) >> user
             1 * userRepository.save(user) >> user
             0 * cryptoService.hashEncode(_) // No password encoding
-            passwordValidator.validate(_) >> validPassword
+            passwordValidator.validate(_) >> validPasswordResult
             savedUser.phones.size() == 4
 
             savedUser.phones[0].id == 1
@@ -388,7 +389,7 @@ class UserServiceSpec extends Specification {
 
         then:
             cryptoService.encrypt('Test&1234' ) >> 'Test&1234'
-            passwordValidator.validate(_) >> validPassword
+            passwordValidator.validate(_) >> validPasswordResult
             1 * cryptoService.hashEncode('Efgh@5678')
             1 * userRepository.findByUsername('username')
             1 * userRepository.save(user)
@@ -403,7 +404,7 @@ class UserServiceSpec extends Specification {
 
         then:
             cryptoService.encrypt('Test&1234' ) >> 'Test&1234'
-            passwordValidator.validate(_) >> validPassword
+            passwordValidator.validate(_) >> validPasswordResult
             0 * cryptoService.hashEncode('Efgh@5678')
             1 * userRepository.findByUsername('username')
             1 * userRepository.save(user)
@@ -417,7 +418,7 @@ class UserServiceSpec extends Specification {
             userService.saveDetached(user)
 
         then:
-            passwordValidator.validate(_) >> invalidPassword
+            passwordValidator.validate(_) >> invalidPasswordResult
             thrown(WeakPasswordException)
     }
 
@@ -429,7 +430,7 @@ class UserServiceSpec extends Specification {
             userService.saveDetached(user)
 
         then:
-            passwordValidator.validate(_) >> invalidPassword
+            passwordValidator.validate(_) >> invalidPasswordResult
             thrown(WeakPasswordException)
     }
 }
