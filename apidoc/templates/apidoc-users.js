@@ -78,7 +78,7 @@
  *     "lastName": "LastName",
  *     "username": "FirstName3@app.com",
  *     "email": "FirstName3@app.com",
- *     "password": "password"
+ *     "password": "Password@1234"
  *     "phones":
  *     [
  *         {
