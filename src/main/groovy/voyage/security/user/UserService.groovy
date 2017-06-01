@@ -15,6 +15,9 @@
  */
 package voyage.security.user
 
+import org.passay.PasswordData
+import org.passay.PasswordValidator
+import org.passay.RuleResult
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -35,12 +38,14 @@ class UserService {
     private final UserRepository userRepository
     private final CryptoService cryptoService
     private final PhoneService phoneService
+    private final PasswordValidator passwordValidator
 
     @Autowired
-    UserService(UserRepository userRepository, CryptoService cryptoService, PhoneService phoneService) {
+    UserService(UserRepository userRepository, CryptoService cryptoService, PhoneService phoneService, PasswordValidator passwordValidator) {
         this.userRepository = userRepository
         this.cryptoService = cryptoService
         this.phoneService = phoneService
+        this.passwordValidator = passwordValidator
     }
 
     static String getCurrentUsername() {
@@ -116,6 +121,10 @@ class UserService {
         }
 
         if (userIn.password != user.password) {
+            RuleResult result = passwordValidator.validate(new PasswordData(userIn.password))
+            if (!result.valid) {
+                throw new WeakPasswordException(result.details.toString())
+            }
             user.password = cryptoService.hashEncode(userIn.password)
         }
 
