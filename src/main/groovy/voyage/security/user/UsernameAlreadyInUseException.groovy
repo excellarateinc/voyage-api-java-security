@@ -40,6 +40,6 @@ class UsernameAlreadyInUseException extends AppException {
 
     @Override
     String getErrorCode() {
-        return HTTP_STATUS.value() + '_username_already_in_use'
+        ErrorUtils.getErrorCode(httpStatus.value(), 'username_already_in_use')
     }
 }

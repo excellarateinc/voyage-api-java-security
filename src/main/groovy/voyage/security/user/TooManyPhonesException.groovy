@@ -40,6 +40,6 @@ class TooManyPhonesException extends AppException {
 
     @Override
     String getErrorCode() {
-        return HTTP_STATUS.value() + '_too_many_phones'
+        ErrorUtils.getErrorCode(httpStatus.value(), 'too_many_phones')
     }
 }
