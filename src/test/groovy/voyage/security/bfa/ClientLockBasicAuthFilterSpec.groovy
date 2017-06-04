@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSession
 
 class ClientLockBasicAuthFilterSpec extends Specification {
     ClientLockBasicAuthFilter filter
+    ClientLockBasicAuthFilterProperties properties
     ClientService clientService
 
     HttpServletRequest request
@@ -41,15 +42,17 @@ class ClientLockBasicAuthFilterSpec extends Specification {
 
         clientService = Mock(ClientService)
 
-        filter = new ClientLockBasicAuthFilter(clientService)
-        filter.isEnabled = true
-        filter.resourcePaths = '/**'
-        filter.maxLoginAttempts = 5
+        properties = new ClientLockBasicAuthFilterProperties()
+        properties.enabled = true
+        properties.resources = '/**'
+        properties.maxLoginAttempts = 5
+
+        filter = new ClientLockBasicAuthFilter(clientService, properties)
     }
 
     def 'doFilterInternal is skipped if disabled'() {
         given:
-            filter.isEnabled = false
+            properties.enabled = false
 
         when:
             filter.doFilter(request, response, filterChain)
@@ -60,8 +63,8 @@ class ClientLockBasicAuthFilterSpec extends Specification {
 
     def 'doFilterInternal skips request if the url doesn not match'() {
         given:
-            filter.isEnabled = true
-            filter.resourcePaths = ['/nomatch']
+            properties.enabled = true
+            properties.resources = ['/nomatch']
 
         when:
             filter.doFilter(request, response, filterChain)
@@ -73,8 +76,8 @@ class ClientLockBasicAuthFilterSpec extends Specification {
 
     def 'doFilterInternal finds a username and the user is authenticated'() {
         given:
-            filter.isEnabled = true
-            filter.resourcePaths = ['/**']
+            properties.enabled = true
+            properties.resources = ['/**']
 
         when:
             filter.doFilter(request, response, filterChain)
@@ -93,8 +96,8 @@ class ClientLockBasicAuthFilterSpec extends Specification {
 
     def 'doFilterInternal client failed authentication and increments failure attempts'() {
         given:
-            filter.isEnabled = true
-            filter.resourcePaths = ['/**']
+            properties.enabled = true
+            properties.resources = ['/**']
 
             Client client = new Client()
             client.isEnabled = true
@@ -119,8 +122,8 @@ class ClientLockBasicAuthFilterSpec extends Specification {
 
     def 'doFilterInternal client failed authentication and locks the client account'() {
         given:
-            filter.isEnabled = true
-            filter.resourcePaths = ['/**']
+            properties.enabled = true
+            properties.resources = ['/**']
 
             Client client = new Client()
             client.isEnabled = true

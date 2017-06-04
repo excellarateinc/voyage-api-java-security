@@ -25,11 +25,13 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.test.context.TestPropertySource
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import spock.lang.Specification
 
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(locations=['file:./src/main/resources/application.properties', 'classpath:test.properties'])
 class AuthenticatedIntegrationTest extends Specification {
     @Autowired
     protected SuperClient superClient
