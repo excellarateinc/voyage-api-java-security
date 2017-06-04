@@ -27,17 +27,20 @@ class SleepAfterFailureFilterSpec extends Specification {
     long maxSleepMillis = 5000
 
     SleepAfterFailureFilter filter
+    SleepAfterFailureProperties properties
 
     HttpServletRequest request
     HttpServletResponse response
     FilterChain filterChain
 
     def setup() {
-        filter = new SleepAfterFailureFilter()
-        filter.isEnabled = true
-        filter.httpStatusList = [401, 403, 404]
-        filter.minSleepSeconds = minSleepMillis / 1000
-        filter.maxSleepSeconds = maxSleepMillis / 1000
+        properties = new SleepAfterFailureProperties()
+        properties.enabled = true
+        properties.httpStatusFailureList = [401, 403, 404]
+        properties.minSleepSeconds = minSleepMillis / 1000
+        properties.maxSleepSeconds = maxSleepMillis / 1000
+
+        filter = new SleepAfterFailureFilter(properties)
 
         request = Mock(HttpServletRequest)
         response = Mock(HttpServletResponse)
@@ -46,7 +49,7 @@ class SleepAfterFailureFilterSpec extends Specification {
 
     def 'doFilterInternal is skipped if disabled'() {
         given:
-            filter.isEnabled = false
+            properties.enabled = false
             StopWatch stopWatch = new StopWatch()
 
         when:

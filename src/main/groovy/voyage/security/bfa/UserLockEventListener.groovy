@@ -17,7 +17,6 @@ package voyage.security.bfa
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.event.EventListener
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent
@@ -32,20 +31,16 @@ import voyage.security.user.UserService
 class UserLockEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(UserLockEventListener)
     private final UserService userService
+    private final UserLockEventListenerProperties userLockEventListenerProperties
 
-    @Value('${security.brute-force-attack.user-lock-event-listener.enabled}')
-    private boolean isEnabled
-
-    @Value('${security.brute-force-attack.user-lock-event-listener.max-login-attempts}')
-    private int maxLoginAttempts
-
-    UserLockEventListener(UserService userService) {
+    UserLockEventListener(UserService userService, UserLockEventListenerProperties userLockEventListenerProperties) {
         this.userService = userService
+        this.userLockEventListenerProperties = userLockEventListenerProperties
     }
 
     @EventListener
     void authenticationSuccess(AuthenticationSuccessEvent event) {
-        if (!isEnabled) {
+        if (!userLockEventListenerProperties.enabled) {
             LOG.debug('UserLockEventListener is DISABLED. Skipping.')
             return
         }
@@ -73,7 +68,7 @@ class UserLockEventListener {
 
     @EventListener
     void authenticationFailed(AbstractAuthenticationFailureEvent event) {
-        if (!isEnabled) {
+        if (!userLockEventListenerProperties.enabled) {
             LOG.debug('UserLockEventListener is DISABLED. Skipping. ')
             return
         }
@@ -96,10 +91,10 @@ class UserLockEventListener {
                     LOG.debug("User ${username} has ${user.failedLoginAttempts} failed login attempts.")
                 }
 
-                if (user.failedLoginAttempts >= maxLoginAttempts) {
+                if (user.failedLoginAttempts >= userLockEventListenerProperties.maxLoginAttempts) {
                     if (LOG.debugEnabled) {
-                        LOG.debug("User ${username} has hit their max failed login attempts of ${maxLoginAttempts}. " +
-                                "Locking user account with ID=${user.id}.")
+                        LOG.debug("User ${username} has hit their max failed login attempts of " +
+                                "${userLockEventListenerProperties.maxLoginAttempts}. Locking user account with ID=${user.id}.")
                     }
                     user.isAccountLocked = true
                 }

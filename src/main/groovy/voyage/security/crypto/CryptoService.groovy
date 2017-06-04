@@ -17,7 +17,6 @@ package voyage.security.crypto
 
 import org.apache.commons.codec.binary.Base64
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -34,11 +33,9 @@ class CryptoService {
     private final KeyPair keyPair
 
     @Autowired
-    CryptoService(KeyStoreService keyStoreService,
-                  @Value('${security.crypto.private-key-name}') String privateKeyName,
-                  @Value('${security.crypto.private-key-password}') String privateKeyPassword) {
+    CryptoService(KeyStoreService keyStoreService, CryptoProperties cryptoProperties) {
         this.cipher = Cipher.getInstance(ALGORITHM)
-        this.keyPair = keyStoreService.getRsaKeyPair(privateKeyName, privateKeyPassword.toCharArray())
+        this.keyPair = keyStoreService.getRsaKeyPair(cryptoProperties.privateKeyName, cryptoProperties.privateKeyPassword.toCharArray())
     }
 
     String encrypt(String plaintext) {

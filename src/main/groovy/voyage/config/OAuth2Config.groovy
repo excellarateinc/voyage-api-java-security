@@ -57,10 +57,10 @@ class OAuth2Config {
     @Configuration
     @EnableAuthorizationServer
     class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
-        @Value('${security.jwt.private-key-name}')
+        @Value('${voyage.security.oauth2.jwt.private-key-name}')
         private String privateKeyName
 
-        @Value('${security.jwt.private-key-password}')
+        @Value('${voyage.security.oauth2.jwt.private-key-password}')
         private String privateKeyPassword
 
         @Autowired
@@ -137,7 +137,7 @@ class OAuth2Config {
         private static final String READ = "#oauth2.hasScope('Read Data')"
         private static final String WRITE = "#oauth2.hasScope('Write Data')"
 
-        @Value('${security.permitAll}')
+        @Value('${voyage.security.permitAll}')
         private String[] permitAllUrls
 
         @Autowired

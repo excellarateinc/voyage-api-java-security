@@ -28,6 +28,7 @@ import java.security.Principal
 
 class VerificationFilterSpec extends Specification {
     VerificationFilter filter
+    VerifyProperties properties
     UserService userService
     String[] resourcePathExclusions
     HttpServletRequest request
@@ -37,8 +38,11 @@ class VerificationFilterSpec extends Specification {
     void setup() {
         userService = Mock(UserService)
         resourcePathExclusions = ['/test/**', '/test2']
-        filter = new VerificationFilter(userService)
-        filter.resourcePathExclusions = resourcePathExclusions
+
+        properties = new VerifyProperties()
+        properties.excludeResources = resourcePathExclusions
+
+        filter = new VerificationFilter(userService, properties)
 
         request = Mock(HttpServletRequest)
         response = Mock(HttpServletResponse)

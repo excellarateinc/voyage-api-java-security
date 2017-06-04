@@ -28,19 +28,21 @@ import voyage.security.user.UserService
 
 class UserLockEventListenerSpec extends Specification {
     UserLockEventListener listener
+    UserLockEventListenerProperties properties
     UserService userService
     UsernamePasswordAuthenticationToken authentication
 
     def setup() {
         userService = Mock(UserService)
-        listener = new UserLockEventListener(userService)
+        properties = new UserLockEventListenerProperties()
+        listener = new UserLockEventListener(userService, properties)
 
         authentication = Mock(UsernamePasswordAuthenticationToken)
     }
 
     def 'authenticationFailed is skipped if disabled'() {
         given:
-            listener.isEnabled = false
+            properties.enabled = false
             AuthenticationException
             AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(
                     authentication,
@@ -57,7 +59,7 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationFailed principal is not a UsernamePasswordAuthenticationToken'() {
         given:
-            listener.isEnabled = true
+            properties.enabled = true
             AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(
                     new TestingAuthenticationToken(null, null),
                     new BadCredentialsException('test')
@@ -72,7 +74,7 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationFailed finds the user that is NOT ENABLED'() {
         given:
-            listener.isEnabled = true
+            properties.enabled = true
             AuthenticationException
             AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(
                     authentication,
@@ -92,27 +94,27 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationFailed finds the user with ACCOUNT LOCKED'() {
         given:
-        listener.isEnabled = true
-        AuthenticationException
-        AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(
-                authentication,
-                new BadCredentialsException('test')
-        )
+            properties.enabled = true
+            AuthenticationException
+            AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(
+                    authentication,
+                    new BadCredentialsException('test')
+            )
 
-        User user = new User(username:'test', isEnabled:true, isAccountLocked:true, isAccountExpired:false, isCredentialsExpired:false)
+            User user = new User(username:'test', isEnabled:true, isAccountLocked:true, isAccountExpired:false, isCredentialsExpired:false)
 
         when:
-        listener.authenticationFailed(event)
+            listener.authenticationFailed(event)
 
         then:
-        1 * authentication.principal >> user.username
-        1 * userService.findByUsername(user.username) >> user
-        0 * userService.saveDetached(user)
+            1 * authentication.principal >> user.username
+            1 * userService.findByUsername(user.username) >> user
+            0 * userService.saveDetached(user)
     }
 
     def 'authenticationFailed finds the user with ACCOUNT EXPIRED'() {
         given:
-            listener.isEnabled = true
+            properties.enabled = true
             AuthenticationException
             AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(
                     authentication,
@@ -132,7 +134,7 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationFailed finds the user with CREDENTIALS EXPIRED'() {
         given:
-            listener.isEnabled = true
+            properties.enabled = true
             AuthenticationException
             AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(
                     authentication,
@@ -152,8 +154,8 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationFailed finds the active user and increments the failed login attempts'() {
         given:
-            listener.isEnabled = true
-            listener.maxLoginAttempts = 5
+            properties.enabled = true
+            properties.maxLoginAttempts = 5
             AuthenticationException
             AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(
                     authentication,
@@ -176,8 +178,8 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationFailed finds the active user and locks the user account'() {
         given:
-            listener.isEnabled = true
-            listener.maxLoginAttempts = 5
+            properties.enabled = true
+            properties.maxLoginAttempts = 5
             AuthenticationException
             AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(
                     authentication,
@@ -200,7 +202,7 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationSuccess is skipped if disabled'() {
         given:
-            listener.isEnabled = false
+            properties.enabled = false
             AuthenticationSuccessEvent event = new AuthenticationSuccessEvent(authentication)
 
         when:
@@ -213,7 +215,7 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationSuccess principal is not a PermissionBasedUserDetails'() {
         given:
-            listener.isEnabled = true
+            properties.enabled = true
             AuthenticationSuccessEvent event = new AuthenticationSuccessEvent(authentication)
 
         when:
@@ -226,7 +228,7 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationSuccess user is found and failed attempts is null'() {
         given:
-            listener.isEnabled = true
+            properties.enabled = true
             AuthenticationSuccessEvent event = new AuthenticationSuccessEvent(authentication)
             User user = new User(username:'test', failedLoginAttempts:null)
 
@@ -241,7 +243,7 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationSuccess user is found and failed attempts is 0'() {
         given:
-            listener.isEnabled = true
+            properties.enabled = true
             AuthenticationSuccessEvent event = new AuthenticationSuccessEvent(authentication)
             User user = new User(username:'test', failedLoginAttempts:0)
 
@@ -256,7 +258,7 @@ class UserLockEventListenerSpec extends Specification {
 
     def 'authenticationSuccess user is found and failed attempts are reset'() {
         given:
-            listener.isEnabled = true
+            properties.enabled = true
             AuthenticationSuccessEvent event = new AuthenticationSuccessEvent(authentication)
             User user = new User(username:'test', failedLoginAttempts:3)
 

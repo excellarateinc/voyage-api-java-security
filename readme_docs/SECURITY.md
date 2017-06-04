@@ -196,7 +196,7 @@ class OAuth2Config {
         private static final String READ = "#oauth2.hasScope('Read Data')"
         private static final String WRITE = "#oauth2.hasScope('Write Data')"
 
-        @Value('${security.permitAll}')
+        @Value('${voyage.security.permitAllsecurity.permitAll}')
         private String[] permitAllUrls
 
         @Autowired
@@ -1520,7 +1520,7 @@ security:
 ```
 
 #### Permit All
-The "security.permitAll" parameter accepts a list of url paths in the [AntPath syntax](http://ant.apache.org/manual/dirtasks.html#patterns). Much like the "security.ignored" parameter, when a request comes in, Spring Security will check to see if the request URL matches any of the patterns in the permitAll list. If the incoming request URL does match a permitAll pattern, then Spring Security will grant the user with full access to the resource and will create a Spring SecurityContext for the request. If the request contains valid authentication credentials, then the authenticated User will be added to the Spring SecurityContext. If the User cannot be determined, then an Anonymous user will be placed into the Spring SecurityContext. 
+The "voyage.security.permitAll" parameter accepts a list of url paths in the [AntPath syntax](http://ant.apache.org/manual/dirtasks.html#patterns). Much like the "security.ignored" parameter, when a request comes in, Spring Security will check to see if the request URL matches any of the patterns in the permitAll list. If the incoming request URL does match a permitAll pattern, then Spring Security will grant the user with full access to the resource and will create a Spring SecurityContext for the request. If the request contains valid authentication credentials, then the authenticated User will be added to the Spring SecurityContext. If the User cannot be determined, then an Anonymous user will be placed into the Spring SecurityContext. 
 
 The primary difference between "ignored" and "permitAll" is that "ignored" URLs do not have a SecurityContext and "permitAll" URLs do have a SecurityContext. Use the "permitAll" parameter when a resource needs to be made public and requires the use of the Spring SecurityContext. 
 

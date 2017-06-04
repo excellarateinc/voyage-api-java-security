@@ -19,7 +19,6 @@ import groovy.json.JsonBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
@@ -52,13 +51,12 @@ import java.security.Principal
 class VerificationFilter implements Filter {
     private static final Logger LOG = LoggerFactory.getLogger(VerificationFilter)
     private final UserService userService
-
-    @Value('${security.user-verification.exclude-resources}')
-    private String[] resourcePathExclusions
+    private final VerifyProperties verifyProperties
 
     @Autowired
-    VerificationFilter(UserService userService) {
+    VerificationFilter(UserService userService, VerifyProperties verifyProperties) {
         this.userService = userService
+        this.verifyProperties = verifyProperties
     }
 
     @Override
@@ -146,7 +144,7 @@ class VerificationFilter implements Filter {
         String path = getRequestPath(request)
         AntPathMatcher antPathMatcher = new AntPathMatcher()
 
-        for (String antPattern : resourcePathExclusions) {
+        for (String antPattern : verifyProperties.excludeResources) {
             if (antPathMatcher.match(antPattern, path)) {
                 return false
             }

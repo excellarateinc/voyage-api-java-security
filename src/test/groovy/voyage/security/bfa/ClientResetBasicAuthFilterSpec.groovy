@@ -30,6 +30,7 @@ import javax.servlet.http.HttpSession
 
 class ClientResetBasicAuthFilterSpec extends Specification {
     ClientResetBasicAuthFilter filter
+    ClientLockBasicAuthFilterProperties properties
     ClientService clientService
 
     HttpServletRequest request
@@ -45,14 +46,16 @@ class ClientResetBasicAuthFilterSpec extends Specification {
 
         clientService = Mock(ClientService)
 
-        filter = new ClientResetBasicAuthFilter(clientService)
-        filter.isEnabled = true
-        filter.resourcePaths = '/**'
+        properties = new ClientLockBasicAuthFilterProperties()
+        properties.enabled = true
+        properties.resources = '/**'
+
+        filter = new ClientResetBasicAuthFilter(clientService, properties)
     }
 
     def 'doFilterInternal is skipped if disabled'() {
         given:
-            filter.isEnabled = false
+            properties.enabled = false
 
         when:
             filter.doFilter(request, response, filterChain)
@@ -63,8 +66,8 @@ class ClientResetBasicAuthFilterSpec extends Specification {
 
     def 'doFilterInternal skips request if the url doesn not match'() {
         given:
-            filter.isEnabled = true
-            filter.resourcePaths = ['/nomatch']
+            properties.enabled = true
+            properties.resources = ['/nomatch']
 
         when:
             filter.doFilter(request, response, filterChain)
@@ -76,8 +79,8 @@ class ClientResetBasicAuthFilterSpec extends Specification {
 
     def 'doFilterInternal finds a username with authenticated client and resets the failedLoginAttempts'() {
         given:
-            filter.isEnabled = true
-            filter.resourcePaths = ['/**']
+            properties.enabled = true
+            properties.resources = ['/**']
             SecurityContext securityContext = Mock(SecurityContext)
             SecurityContextHolder.context = securityContext
             Authentication authentication = Mock(Authentication)

@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets
 class HttpActionLogFilterSpec extends Specification {
     private static final String CHARSET = 'UTF-8'
     HttpActionLogFilter filter
+    HttpActionLogProperties properties
     ActionLogService actionLogService
     UserService userService
     ClientService clientService
@@ -49,10 +50,12 @@ class HttpActionLogFilterSpec extends Specification {
         currentUser = Mock(User)
         currentClient = Mock(Client)
 
-        filter = new HttpActionLogFilter(actionLogService, userService, clientService)
-        filter.maskFields = ['password']
-        filter.formUsernameFields = ['username']
-        filter.excludeResourcePaths = []
+        properties = new HttpActionLogProperties()
+        properties.maskFields = ['password']
+        properties.formUsernameFields = ['username']
+        properties.excludeResources = []
+
+        filter = new HttpActionLogFilter(actionLogService, userService, clientService, properties)
     }
 
     def 'filterRequestBody with FORM content type with invalid content'() {
@@ -169,7 +172,7 @@ class HttpActionLogFilterSpec extends Specification {
 
     def 'isRequestFilterable matches only specific paths'() {
         given:
-            filter.excludeResourcePaths = ['/nomatch']
+            properties.excludeResources = ['/nomatch']
         when:
             boolean isFilterable = filter.isRequestFilterable(request)
         then:
@@ -179,7 +182,7 @@ class HttpActionLogFilterSpec extends Specification {
 
     def 'isRequestFilterable matches /api'() {
         given:
-           filter.excludeResourcePaths = ['/resources/**']
+            properties.excludeResources = ['/resources/**']
         when:
             boolean isFilterable = filter.isRequestFilterable(request)
         then:
@@ -201,7 +204,7 @@ class HttpActionLogFilterSpec extends Specification {
 
     def 'appendMasked masks the value defined in maskedFields'() {
         given:
-            filter.maskFields = ['KEY1', 'KEY2']
+            properties.maskFields = ['KEY1', 'KEY2']
             StringBuilder builder = new StringBuilder()
             String key = 'KEY1'
             String value = 'VALUE1'
@@ -335,7 +338,7 @@ class HttpActionLogFilterSpec extends Specification {
 
     def 'getUserPrincipal from FORM parameters if not found anywhere else'() {
         given:
-            filter.formUsernameFields = ['username']
+            properties.formUsernameFields = ['username']
         when:
             String userPrincipal = filter.getUserPrincipal(request)
         then:
@@ -345,7 +348,7 @@ class HttpActionLogFilterSpec extends Specification {
 
     def 'doFilterInternal is not filterable on /resources/test'() {
         given:
-            filter.excludeResourcePaths = ['/resources/**']
+            properties.excludeResources = ['/resources/**']
         when:
             filter.doFilterInternal(request, response, filterChain)
         then:
@@ -361,8 +364,8 @@ class HttpActionLogFilterSpec extends Specification {
             byte[] requestBodyBytes = requestBodyJSON.getBytes(StandardCharsets.UTF_8)
 
             // Storing the request body can only be tested via Integration test
-            filter.isStoreRequestBody = false
-            filter.isStoreResponseBody = false
+            properties.storeRequestBody = false
+            properties.storeResponseBody = false
 
         when:
             filter.doFilterInternal(request, response, filterChain)

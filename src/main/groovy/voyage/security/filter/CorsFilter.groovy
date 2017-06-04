@@ -18,7 +18,6 @@ package voyage.security.filter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import voyage.security.client.Client
@@ -60,13 +59,12 @@ class CorsFilter extends OncePerRequestFilter {
     private static final String HEADER_CORS_WILDCARD_VALUE = '*'
 
     private final ClientService clientService
-
-    @Value('${security.cors.access-control-allow-headers}')
-    String accessControlAllowHeaders
+    private final CorsProperties corsProperties
 
     @Autowired
-    CorsFilter(ClientService clientService) {
+    CorsFilter(ClientService clientService, CorsProperties corsProperties) {
         this.clientService = clientService
+        this.corsProperties = corsProperties
     }
 
     @Override
@@ -102,12 +100,12 @@ class CorsFilter extends OncePerRequestFilter {
         response.addHeader(HEADER_VARY, HEADER_ORIGIN)
         response.addHeader(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, origin)
         response.addHeader(HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS_VALUE)
-        response.addHeader(HEADER_ACCESS_ALLOW_HEADERS, accessControlAllowHeaders)
+        response.addHeader(HEADER_ACCESS_ALLOW_HEADERS, corsProperties.accessControlAllowHeaders)
     }
 
     private void writePublicResponseHeaders(HttpServletResponse response) {
         response.addHeader(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, HEADER_CORS_WILDCARD_VALUE)
-        response.addHeader(HEADER_ACCESS_ALLOW_HEADERS, accessControlAllowHeaders)
+        response.addHeader(HEADER_ACCESS_ALLOW_HEADERS, corsProperties.accessControlAllowHeaders)
     }
 
     private static boolean isRequestFilterable(HttpServletRequest request, HttpServletResponse response) {

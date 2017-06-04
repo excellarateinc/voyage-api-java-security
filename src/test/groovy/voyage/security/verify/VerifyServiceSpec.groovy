@@ -28,9 +28,12 @@ class VerifyServiceSpec extends Specification {
     UserService userService = Mock()
     CryptoService cryptoService = Mock()
     AwsSmsService smsService  = Mock()
-    VerifyService verifyService = new VerifyService(userService, cryptoService, smsService)
+    VerifyService verifyService
+    VerifyProperties verifyProperties
 
     def setup() {
+        verifyProperties = new VerifyProperties()
+        verifyService = new VerifyService(userService, cryptoService, smsService, verifyProperties)
         verifyService.appName = 'Voyage'
 
         user = new User(firstName:'Test1', lastName:'User', username:'username', email:'test@test.com', password:'password')
