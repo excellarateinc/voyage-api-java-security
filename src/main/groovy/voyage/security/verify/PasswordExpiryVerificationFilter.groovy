@@ -1,10 +1,24 @@
+/*
+ * Copyright (c) 2017 Lighthouse Software, Inc.   http://www.LighthouseSoftware.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package voyage.security.verify
 
 import groovy.json.JsonBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.annotation.Order
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
@@ -27,24 +41,19 @@ import voyage.security.user.UserService
 class PasswordExpiryVerificationFilter implements Filter {
     private static final Logger LOG = LoggerFactory.getLogger(PasswordExpiryVerificationFilter)
 
-    @Value('${security.password-verification.password-reset-days}')
-    private int passwordResetDays
-
-    @Value('${security.user-verification.exclude-resources}')
-    private String[] userResourcePathExclusions
-
-    @Value('${security.password-verification.exclude-resources}')
-    private String[] passwordResourcePathExclusions
-
     private final UserService userService
+    private final VerifyProperties verifyProperties
+    private final PasswordVerifyProperties passwordVerifyProperties
 
     @Override
     void init(FilterConfig filterConfig) throws ServletException {
     }
 
     @Autowired
-    PasswordExpiryVerificationFilter(UserService userService) {
+    PasswordExpiryVerificationFilter(UserService userService, VerifyProperties verifyProperties, PasswordVerifyProperties passwordVerifyProperties) {
         this.userService = userService
+        this.verifyProperties = verifyProperties
+        this.passwordVerifyProperties = passwordVerifyProperties
     }
 
     @Override
@@ -114,12 +123,12 @@ class PasswordExpiryVerificationFilter implements Filter {
     private boolean isRequestFilterable(HttpServletRequest request) {
         String path = getRequestPath(request)
         AntPathMatcher antPathMatcher = new AntPathMatcher()
-        for (String antPattern : userResourcePathExclusions) {
+        for (String antPattern : verifyProperties.excludeResources) {
             if (antPathMatcher.match(antPattern, path)) {
                 return false
             }
         }
-        for (String antPattern : passwordResourcePathExclusions) {
+        for (String antPattern : passwordVerifyProperties.excludeResources) {
             if (antPathMatcher.match(antPattern, path)) {
                 return false
             }
@@ -137,10 +146,10 @@ class PasswordExpiryVerificationFilter implements Filter {
 
     private boolean isPasswordExpired(User user) {
         Integer diffInDays = new Date() - user.passwordCreatedDate
-        if (passwordResetDays == 0) {
+        if (passwordVerifyProperties.passwordResetDays == 0) {
             return false
         }
-        return  diffInDays > passwordResetDays
+        return  diffInDays > passwordVerifyProperties.passwordResetDays
     }
 
     @Override

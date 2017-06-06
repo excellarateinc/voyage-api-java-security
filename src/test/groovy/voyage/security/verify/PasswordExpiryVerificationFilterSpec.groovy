@@ -28,6 +28,8 @@ import java.security.Principal
 class PasswordExpiryVerificationFilterSpec extends Specification {
     PasswordExpiryVerificationFilter filter
     UserService userService
+    VerifyProperties userProperties
+    PasswordVerifyProperties passwordProperties
     String[] resourcePathExclusions
     HttpServletRequest request
     HttpServletResponse response
@@ -36,10 +38,13 @@ class PasswordExpiryVerificationFilterSpec extends Specification {
     void setup() {
         userService = Mock(UserService)
         resourcePathExclusions = ['/test/**', '/test2']
-        filter = new PasswordExpiryVerificationFilter(userService)
-        filter.userResourcePathExclusions = resourcePathExclusions
-        filter.passwordResourcePathExclusions = resourcePathExclusions
-        filter.passwordResetDays = 90
+        userProperties = new VerifyProperties()
+        passwordProperties = new PasswordVerifyProperties()
+        userProperties.excludeResources = resourcePathExclusions
+        passwordProperties.excludeResources = resourcePathExclusions
+        passwordProperties.passwordResetDays = 90
+        filter = new PasswordExpiryVerificationFilter(userService, userProperties, passwordProperties)
+
         request = Mock(HttpServletRequest)
         response = Mock(HttpServletResponse)
         filterChain = Mock(FilterChain)
@@ -159,7 +164,7 @@ class PasswordExpiryVerificationFilterSpec extends Specification {
         given:
             Authentication userPrincipal = Mock(Authentication)
             UserDetails userDetails = Mock(UserDetails)
-            filter.passwordResetDays = 0
+            passwordProperties.passwordResetDays = 0
 
         when:
             filter.doFilter(request, response, filterChain)

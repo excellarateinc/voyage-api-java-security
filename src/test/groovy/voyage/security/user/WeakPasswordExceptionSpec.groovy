@@ -41,7 +41,7 @@ class WeakPasswordExceptionSpec extends  Specification {
 
     def 'Override the exception message with resultData only affects the description for one result'() {
         when:
-            RuleResultDetail result1 = new RuleResultDetail("INSUFFICIENT_UPPERCASE",null)
+            RuleResultDetail result1 = new RuleResultDetail('INSUFFICIENT_UPPERCASE', null)
             WeakPasswordException ex = new WeakPasswordException([result1])
 
         then:
@@ -53,13 +53,13 @@ class WeakPasswordExceptionSpec extends  Specification {
 
     def 'Override the exception message with resultData only affects the description for one multiple results'() {
         when:
-            RuleResultDetail result1 = new RuleResultDetail("INSUFFICIENT_UPPERCASE",null)
-            RuleResultDetail result2 = new RuleResultDetail("INSUFFICIENT_SPECIAL",null)
-            RuleResultDetail result3 = new RuleResultDetail("INSUFFICIENT_LOWERCASE",null)
-            RuleResultDetail result4 = new RuleResultDetail("INSUFFICIENT_DIGIT",null)
-            RuleResultDetail result5 = new RuleResultDetail("TOO_SHORT",null)
-            RuleResultDetail result6 = new RuleResultDetail("TOO_LONG",null)
-            WeakPasswordException ex = new WeakPasswordException([result1,result2,result3,result4,result5,result6])
+            RuleResultDetail result1 = new RuleResultDetail('INSUFFICIENT_UPPERCASE', null)
+            RuleResultDetail result2 = new RuleResultDetail('INSUFFICIENT_SPECIAL', null)
+            RuleResultDetail result3 = new RuleResultDetail('INSUFFICIENT_LOWERCASE', null)
+            RuleResultDetail result4 = new RuleResultDetail('INSUFFICIENT_DIGIT', null)
+            RuleResultDetail result5 = new RuleResultDetail('TOO_SHORT', null)
+            RuleResultDetail result6 = new RuleResultDetail('TOO_LONG', null)
+            WeakPasswordException ex = new WeakPasswordException([result1, result2, result3, result4, result5, result6])
 
         then:
             ex.httpStatus == HttpStatus.BAD_REQUEST
