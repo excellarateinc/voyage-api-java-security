@@ -380,6 +380,7 @@ class UserServiceSpec extends Specification {
             userRepository.findOne(_) >> user
             user.isDeleted
     }
+
     def 'update password - updating password with new password should compare passwords and saving user object'() {
         given:
             user.password = 'Efgh@5678'

@@ -123,7 +123,8 @@ class UserService {
         if (userIn.password != user.password) {
             RuleResult result = passwordValidator.validate(new PasswordData(userIn.password))
             if (!result.valid) {
-                throw new WeakPasswordException(result.details.toString())
+                throw new WeakPasswordException(result?.details)
+
             }
             user.password = cryptoService.hashEncode(userIn.password)
         }
