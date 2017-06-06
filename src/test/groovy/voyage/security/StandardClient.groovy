@@ -20,9 +20,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class StandardClient implements TestClient {
-    @Value('${security.test.clients.standard-client.client-id}')
+    @Value('${voyage.security.test.clients.standard-client.client-id}')
     String clientId
 
-    @Value('${security.test.clients.standard-client.client-secret}')
+    @Value('${voyage.security.test.clients.standard-client.client-secret}')
     String clientSecret
 }

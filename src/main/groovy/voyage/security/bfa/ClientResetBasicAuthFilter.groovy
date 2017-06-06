@@ -16,7 +16,6 @@
 package voyage.security.bfa
 
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
@@ -48,23 +47,19 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class ClientResetBasicAuthFilter extends BasicAuthFilter {
     private final ClientService clientService
+    private final ClientLockBasicAuthFilterProperties clientLockBasicAuthFilterProperties
 
-    @Value('${security.brute-force-attack.client-lock-basic-auth-filter.enabled}')
-    private boolean isEnabled
-
-    @Value('${security.brute-force-attack.client-lock-basic-auth-filter.resources}')
-    private String[] resourcePaths
-
-    ClientResetBasicAuthFilter(ClientService clientService) {
+    ClientResetBasicAuthFilter(ClientService clientService, ClientLockBasicAuthFilterProperties clientLockBasicAuthFilterProperties) {
         this.clientService = clientService
         this.log = LoggerFactory.getLogger(ClientResetBasicAuthFilter)
+        this.clientLockBasicAuthFilterProperties = clientLockBasicAuthFilterProperties
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        if (isEnabled) {
-            if (isRequestFilterable(request, resourcePaths)) {
+        if (clientLockBasicAuthFilterProperties.enabled) {
+            if (isRequestFilterable(request, clientLockBasicAuthFilterProperties.resources)) {
                 String username = findUsername(request)
                 Authentication authentication = SecurityContextHolder.context.authentication
                 if (username && authentication?.isAuthenticated()) {

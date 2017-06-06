@@ -15,7 +15,6 @@
  */
 package voyage.security.crypto
 
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
@@ -34,11 +33,9 @@ class KeyStoreService {
     private final Object lock = new Object()
     private final KeyStore keyStore
 
-    @SuppressWarnings(['SpaceAfterOpeningBrace'])
-    KeyStoreService(@Value('${security.key-store.filename}') String keyStoreFileName,
-                    @Value('${security.key-store.password}') String keyStorePassword) {
-        Resource keyStoreFile = new ClassPathResource(keyStoreFileName)
-        char[] keyStoreFilePassword = keyStorePassword.toCharArray()
+    KeyStoreService(CryptoProperties cryptoProperties) {
+        Resource keyStoreFile = new ClassPathResource(cryptoProperties.keyStoreFileName)
+        char[] keyStoreFilePassword = cryptoProperties.keyStorePassword.toCharArray()
         synchronized (lock) {
             if (keyStore == null) {
                 keyStore = KeyStore.getInstance(JKS_KEYSTORE)

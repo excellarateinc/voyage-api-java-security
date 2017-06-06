@@ -33,21 +33,20 @@ import javax.validation.constraints.NotNull
 @Service
 @Validated
 class VerifyService {
-    @Value('${security.user-verification.verify-code-expire-minutes}')
-    private int verifyCodeExpires
-
     @Value('${app.name}')
     private String appName
 
     private final UserService userService
     private final CryptoService cryptoService
     private final AwsSmsService smsService
+    private final VerifyProperties verifyProperties
 
     @Autowired
-    VerifyService(UserService userService, CryptoService cryptoService, AwsSmsService smsService) {
+    VerifyService(UserService userService, CryptoService cryptoService, AwsSmsService smsService, VerifyProperties verificationProperties) {
         this.userService = userService
         this.cryptoService = cryptoService
         this.smsService = smsService
+        this.verifyProperties = verificationProperties
     }
 
     boolean verifyCurrentUser(@NotNull String code) {
@@ -102,7 +101,7 @@ class VerifyService {
         String verifyCode = SecurityCode.userVerifyCode
         mobilePhone.verifyCode = cryptoService.hashEncode(verifyCode)
         use(TimeCategory) {
-            mobilePhone.verifyCodeExpiresOn = new Date() + verifyCodeExpires.minutes
+            mobilePhone.verifyCodeExpiresOn = new Date() + verifyProperties.verifyCodeExpiresMinutes.minutes
         }
 
         SmsMessage smsMessage = new SmsMessage()

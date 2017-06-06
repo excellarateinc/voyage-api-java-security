@@ -34,8 +34,13 @@ class KeyStoreServiceIntegrationSpec extends AuthenticatedIntegrationTest {
     }
 
     def 'KeyStoreService throws exception when the keystore cannot be loaded'() {
+        given:
+            CryptoProperties properties = new CryptoProperties()
+            properties.keyStoreFileName = 'keystore.jks'
+            properties.keyStorePassword = 'wrong-password'
+
         when:
-            KeyStoreService service = new KeyStoreService('keystore.jks', 'wrong-password')
+            KeyStoreService service = new KeyStoreService(properties)
 
         then:
             !service

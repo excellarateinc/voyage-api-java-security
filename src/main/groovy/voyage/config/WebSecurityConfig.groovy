@@ -44,7 +44,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value('${security.ignored}')
     private String[] ignoredUrls
 
-    @Value('${security.permitAll}')
+    @Value('${voyage.security.permitAll}')
     private String[] permitAllUrls
 
     @Autowired

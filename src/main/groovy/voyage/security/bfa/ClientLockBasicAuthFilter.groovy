@@ -16,7 +16,6 @@
 package voyage.security.bfa
 
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import voyage.security.client.Client
@@ -47,18 +46,11 @@ import javax.servlet.http.HttpServletResponse
 @Order(-10000)
 class ClientLockBasicAuthFilter extends BasicAuthFilter {
     private final ClientService clientService
+    private final ClientLockBasicAuthFilterProperties clientLockBasicAuthProperties
 
-    @Value('${security.brute-force-attack.client-lock-basic-auth-filter.enabled}')
-    private boolean isEnabled
-
-    @Value('${security.brute-force-attack.client-lock-basic-auth-filter.resources}')
-    private String[] resourcePaths
-
-    @Value('${security.brute-force-attack.client-lock-basic-auth-filter.max-login-attempts}')
-    private int maxLoginAttempts
-
-    ClientLockBasicAuthFilter(ClientService clientService) {
+    ClientLockBasicAuthFilter(ClientService clientService, ClientLockBasicAuthFilterProperties clientLockBasicAuthProperties) {
         this.clientService = clientService
+        this.clientLockBasicAuthProperties = clientLockBasicAuthProperties
         this.log = LoggerFactory.getLogger(ClientLockBasicAuthFilter)
     }
 
@@ -67,8 +59,8 @@ class ClientLockBasicAuthFilter extends BasicAuthFilter {
             throws ServletException, IOException {
         boolean isFilterable = false
 
-        if (isEnabled) {
-            isFilterable = isRequestFilterable(request, resourcePaths)
+        if (clientLockBasicAuthProperties.enabled) {
+            isFilterable = isRequestFilterable(request, clientLockBasicAuthProperties.resources)
             if (isFilterable) {
                 // Initialize the session so that isClientBasicAuthFailure() doesn't fail when checking the session for an
                 // attribute when the Basic Auth request fails and doesn't create a session.
@@ -109,9 +101,9 @@ class ClientLockBasicAuthFilter extends BasicAuthFilter {
                 log.debug("Client ${username} has ${client.failedLoginAttempts} failed login attempts.")
             }
 
-            if (client.failedLoginAttempts >= maxLoginAttempts) {
+            if (client.failedLoginAttempts >= clientLockBasicAuthProperties.maxLoginAttempts) {
                 if (log.debugEnabled) {
-                    log.debug("Client ${username} has hit their max failed login attempts of ${maxLoginAttempts}. " +
+                    log.debug("Client ${username} has hit their max failed login attempts of ${clientLockBasicAuthProperties.maxLoginAttempts}. " +
                             "Locking Client with ID=${client.id}.")
                 }
                 client.isAccountLocked = true

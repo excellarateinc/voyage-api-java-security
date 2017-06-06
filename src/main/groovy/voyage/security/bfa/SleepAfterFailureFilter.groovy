@@ -17,7 +17,6 @@ package voyage.security.bfa
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -32,29 +31,22 @@ import java.security.SecureRandom
 @Order(-10001)
 class SleepAfterFailureFilter extends OncePerRequestFilter {
     private static final Logger LOG = LoggerFactory.getLogger(SleepAfterFailureFilter)
+    private final SleepAfterFailureProperties sleepAfterFailureProperties
 
-    @Value('${security.brute-force-attack.sleep-after-failure.enabled}')
-    private boolean isEnabled
-
-    @Value('${security.brute-force-attack.sleep-after-failure.http-status-failure-list}')
-    private int[] httpStatusList
-
-    @Value('${security.brute-force-attack.sleep-after-failure.min-sleep-seconds}')
-    private int minSleepSeconds
-
-    @Value('${security.brute-force-attack.sleep-after-failure.max-sleep-seconds}')
-    private int maxSleepSeconds
+    SleepAfterFailureFilter(SleepAfterFailureProperties sleepAfterFailureProperties) {
+        this.sleepAfterFailureProperties = sleepAfterFailureProperties
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        if (!isEnabled) {
+        if (!sleepAfterFailureProperties.enabled) {
             LOG.debug('SleepAfterFailureFilter is DISABLED. Skipping.')
         }
 
         filterChain.doFilter(request, response)
 
-        if (isEnabled) {
+        if (sleepAfterFailureProperties.enabled) {
             sleepAfterFailureHttpStatus(response)
         }
     }
@@ -65,15 +57,15 @@ class SleepAfterFailureFilter extends OncePerRequestFilter {
             LOG.debug("Found HTTP Status: ${response.status}")
         }
 
-        if (httpStatusList.contains(response.status)) {
+        if (sleepAfterFailureProperties.httpStatusFailureList.contains(response.status)) {
             if (LOG.debugEnabled) {
-                LOG.debug("${response.status} is a match in the list ${httpStatusList}")
+                LOG.debug("${response.status} is a match in the list ${sleepAfterFailureProperties.httpStatusFailureList}")
             }
 
             SecureRandom random = new SecureRandom()
-            int sleepSeconds = random.nextInt(maxSleepSeconds)
-            if (sleepSeconds < minSleepSeconds) {
-                sleepSeconds = minSleepSeconds
+            int sleepSeconds = random.nextInt(sleepAfterFailureProperties.maxSleepSeconds)
+            if (sleepSeconds < sleepAfterFailureProperties.minSleepSeconds) {
+                sleepSeconds = sleepAfterFailureProperties.minSleepSeconds
             }
 
             if (LOG.debugEnabled) {

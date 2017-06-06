@@ -22,16 +22,19 @@ class SleepAfterFailureEventListenerSpec extends Specification {
     long minSleepMillis = 3000
     long maxSleepMillis = 5000
     SleepAfterFailureEventListener listener
+    SleepAfterFailureProperties properties
 
     def setup() {
-        listener = new SleepAfterFailureEventListener()
-        listener.minSleepSeconds = minSleepMillis / 1000
-        listener.maxSleepSeconds = maxSleepMillis / 1000
+        properties = new SleepAfterFailureProperties()
+        properties.minSleepSeconds = minSleepMillis / 1000
+        properties.maxSleepSeconds = maxSleepMillis / 1000
+
+        listener = new SleepAfterFailureEventListener(properties)
     }
 
     def 'authenticationFailed is skipped if disabled'() {
         given:
-            listener.isEnabled = false
+            properties.enabled = false
             StopWatch stopWatch = new StopWatch()
 
         when:
@@ -45,7 +48,7 @@ class SleepAfterFailureEventListenerSpec extends Specification {
 
     def 'authenticationFailed sleeps between the min and max amount'() {
         given:
-            listener.isEnabled = true
+        properties.enabled = true
             StopWatch stopWatch = new StopWatch()
 
         when:

@@ -17,6 +17,7 @@ package voyage.security.permission
 
 import org.springframework.http.HttpStatus
 import voyage.core.error.AppException
+import voyage.core.error.ErrorUtils
 
 class ImmutableRecordException extends AppException {
     private static final HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST
@@ -28,5 +29,9 @@ class ImmutableRecordException extends AppException {
 
     ImmutableRecordException(String message) {
         super(HTTP_STATUS, message)
+    }
+    @Override
+    String getErrorCode() {
+        ErrorUtils.getErrorCode(httpStatus.value(), 'bad_request')
     }
 }

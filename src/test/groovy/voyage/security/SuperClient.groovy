@@ -20,9 +20,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class SuperClient implements TestClient {
-    @Value('${security.test.clients.super-client.client-id}')
+    @Value('${voyage.security.test.clients.super-client.client-id}')
     String clientId
 
-    @Value('${security.test.clients.super-client.client-secret}')
+    @Value('${voyage.security.test.clients.super-client.client-secret}')
     String clientSecret
 }

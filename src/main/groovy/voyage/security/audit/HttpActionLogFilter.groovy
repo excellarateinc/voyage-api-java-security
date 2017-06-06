@@ -20,7 +20,6 @@ import org.apache.http.NameValuePair
 import org.apache.http.client.utils.URLEncodedUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.annotation.Order
 import org.springframework.security.crypto.codec.Base64
 import org.springframework.stereotype.Component
@@ -59,30 +58,18 @@ class HttpActionLogFilter extends OncePerRequestFilter {
     public static final String CLIENT_KEY = 'HTTP_ACTION_LOG_CLIENT'
     public static final String USER_PRINCIPAL_KEY = 'HTTP_ACTION_LOG_USER_PRINCIPAL'
 
-    @Value('${security.http-audit-log.exclude-resources}')
-    private String[] excludeResourcePaths
-
-    @Value('${security.http-audit-log.mask-fields}')
-    private String[] maskFields
-
-    @Value('${security.http-audit-log.form-username-fields}')
-    private String[] formUsernameFields
-
-    @Value('${security.http-audit-log.store-request-body}')
-    private boolean isStoreRequestBody
-
-    @Value('${security.http-audit-log.store-response-body}')
-    private boolean isStoreResponseBody
-
     private final ActionLogService actionLogService
     private final UserService userService
     private final ClientService clientService
+    private final HttpActionLogProperties httpActionLogProperties
 
     @Autowired
-    HttpActionLogFilter(ActionLogService actionLogService, UserService userService, ClientService clientService) {
+    HttpActionLogFilter(ActionLogService actionLogService, UserService userService, ClientService clientService,
+                        HttpActionLogProperties httpActionLogProperties) {
         this.actionLogService = actionLogService
         this.userService = userService
         this.clientService = clientService
+        this.httpActionLogProperties = httpActionLogProperties
     }
 
     @Override
@@ -141,11 +128,11 @@ class HttpActionLogFilter extends OncePerRequestFilter {
             responseHeaders = getHeaders(response)
         }
 
-        if (isStoreRequestBody) {
+        if (httpActionLogProperties.storeRequestBody) {
             actionLog.requestBody = getBody(request.contentType, request.contentAsByteArray, request.characterEncoding)
         }
 
-        if (isStoreResponseBody) {
+        if (httpActionLogProperties.storeResponseBody) {
             actionLog.responseBody = getBody(response.contentType, response.contentAsByteArray, response.characterEncoding)
         }
 
@@ -162,8 +149,8 @@ class HttpActionLogFilter extends OncePerRequestFilter {
 
         // Check the request parameters for a username if form authentication failed
         if (!userPrincipal) {
-            for (int i; i < formUsernameFields.size(); i++) {
-                userPrincipal = request.getParameter(formUsernameFields[i])
+            for (int i; i < httpActionLogProperties.formUsernameFields.size(); i++) {
+                userPrincipal = request.getParameter(httpActionLogProperties.formUsernameFields[i])
                 if (userPrincipal) {
                     break
                 }
@@ -253,7 +240,7 @@ class HttpActionLogFilter extends OncePerRequestFilter {
             }
         } else if (contentType?.equalsIgnoreCase('application/json')) {
             try {
-                body = JsonUtil.replaceAll(httpContent, maskFields, MASKED_VALUE)
+                body = JsonUtil.replaceAll(httpContent, httpActionLogProperties.maskFields, MASKED_VALUE)
             } catch (JsonException ignore) {
                 if (LOG.debugEnabled) {
                     LOG.debug('filterRequestBody(): Could not parse JSON ' + httpContent)
@@ -265,7 +252,7 @@ class HttpActionLogFilter extends OncePerRequestFilter {
 
     private StringBuilder appendMasked(StringBuilder builder, String key, String value, String delimiter) {
         builder.append(key).append(delimiter)
-        boolean isMaskedField = maskFields.find { fieldName ->
+        boolean isMaskedField = httpActionLogProperties.maskFields.find { fieldName ->
             fieldName.equalsIgnoreCase(key)
         }
         if (isMaskedField) {
@@ -278,7 +265,7 @@ class HttpActionLogFilter extends OncePerRequestFilter {
     protected boolean isRequestFilterable(HttpServletRequest request) {
         String path = getRequestPath(request)
         AntPathMatcher antPathMatcher = new AntPathMatcher()
-        for (String antPattern : excludeResourcePaths) {
+        for (String antPattern : httpActionLogProperties.excludeResources) {
             if (antPathMatcher.match(antPattern, path)) {
                 if (LOG.debugEnabled) {
                     LOG.debug("Request path ${path} is excluded from this filter. Skipping.")
