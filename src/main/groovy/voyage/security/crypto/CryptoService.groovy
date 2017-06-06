@@ -22,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 import javax.crypto.Cipher
-import java.security.KeyPair
 
 @Service
 class CryptoService {
@@ -30,12 +29,14 @@ class CryptoService {
     private static final String ALGORITHM = 'RSA'
     private static final String ENCODING = 'UTF-8'
     private final Cipher cipher
-    private final KeyPair keyPair
+    private final CryptoProperties cryptoProperties
+    private final KeyStoreService keyStoreService
 
     @Autowired
     CryptoService(KeyStoreService keyStoreService, CryptoProperties cryptoProperties) {
         this.cipher = Cipher.getInstance(ALGORITHM)
-        this.keyPair = keyStoreService.getRsaKeyPair(cryptoProperties.privateKeyName, cryptoProperties.privateKeyPassword.toCharArray())
+        this.keyStoreService = keyStoreService
+        this.cryptoProperties = cryptoProperties
     }
 
     String encrypt(String plaintext) {
@@ -60,5 +61,9 @@ class CryptoService {
             return false
         }
         return PASSWORD_ENCODER.matches(plaintext, hashValue)
+    }
+
+    private getKeyPair() {
+        return keyStoreService.getRsaKeyPair(cryptoProperties.privateKeyName, cryptoProperties.privateKeyPassword.toCharArray())
     }
 }

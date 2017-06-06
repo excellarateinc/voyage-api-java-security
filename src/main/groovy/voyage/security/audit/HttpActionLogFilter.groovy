@@ -36,6 +36,7 @@ import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import java.nio.charset.Charset
 
 /**
  * Filter that intercepts the incoming request and outgoing response and logs all relevant data to the database. Since
@@ -106,6 +107,8 @@ class HttpActionLogFilter extends OncePerRequestFilter {
             httpMethod = request.method
             requestHeaders = getHeaders(request)
             url = request.requestURL
+            createdDate = new Date()
+            lastModifiedDate = new Date()
         }
         if (request.queryString) {
             actionLog.url += '?' + request.queryString
@@ -218,7 +221,7 @@ class HttpActionLogFilter extends OncePerRequestFilter {
             String url = 'http://placeholder?' + httpContent
             List<NameValuePair> params
             try {
-                params = URLEncodedUtils.parse(new URI(url), encoding)
+                params = URLEncodedUtils.parse(new URI(url), Charset.forName(encoding))
             } catch (URISyntaxException ignore) {
                 if (LOG.debugEnabled) {
                     LOG.debug('filterRequestBody(): Could not parse url ' + url)

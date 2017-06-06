@@ -41,9 +41,9 @@ class KeyStoreServiceIntegrationSpec extends AuthenticatedIntegrationTest {
 
         when:
             KeyStoreService service = new KeyStoreService(properties)
+            service.getRsaKeyPair('test', 'test'.toCharArray())
 
         then:
-            !service
             IOException ex = thrown()
             ex != null
     }

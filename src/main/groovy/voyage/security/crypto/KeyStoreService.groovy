@@ -31,26 +31,34 @@ class KeyStoreService {
     private static final String JKS_KEYSTORE = 'jks'
     private static final String ALGORITHM = 'RSA'
     private final Object lock = new Object()
-    private final KeyStore keyStore
+    private final CryptoProperties cryptoProperties
+    private KeyStore keyStore
 
     KeyStoreService(CryptoProperties cryptoProperties) {
-        Resource keyStoreFile = new ClassPathResource(cryptoProperties.keyStoreFileName)
-        char[] keyStoreFilePassword = cryptoProperties.keyStorePassword.toCharArray()
-        synchronized (lock) {
-            if (keyStore == null) {
-                keyStore = KeyStore.getInstance(JKS_KEYSTORE)
-                keyStore.load(keyStoreFile.inputStream, keyStoreFilePassword)
-            }
-        }
+        this.cryptoProperties = cryptoProperties
     }
 
     KeyPair getRsaKeyPair(String alias, char[] password) {
-        if (keyStore) {
-            RSAPrivateCrtKey key = (RSAPrivateCrtKey)keyStore.getKey(alias, password)
-            RSAPublicKeySpec spec = new RSAPublicKeySpec(key.modulus, key.publicExponent)
-            PublicKey publicKey = KeyFactory.getInstance(ALGORITHM).generatePublic(spec)
-            return new KeyPair(publicKey, key)
+        initializeKeyStore()
+        RSAPrivateCrtKey key = (RSAPrivateCrtKey)keyStore.getKey(alias, password)
+        RSAPublicKeySpec spec = new RSAPublicKeySpec(key.modulus, key.publicExponent)
+        PublicKey publicKey = KeyFactory.getInstance(ALGORITHM).generatePublic(spec)
+        return new KeyPair(publicKey, key)
+    }
+
+    private void initializeKeyStore() {
+        if (!keyStore) {
+            Resource keyStoreFile = new ClassPathResource(cryptoProperties.keyStoreFileName)
+            char[] keyStoreFilePassword = cryptoProperties.keyStorePassword.toCharArray()
+            synchronized (lock) {
+                if (keyStore == null) {
+                    keyStore = KeyStore.getInstance(JKS_KEYSTORE)
+                    keyStore.load(keyStoreFile.inputStream, keyStoreFilePassword)
+                }
+            }
+            if (!keyStore) {
+                throw new IllegalStateException('Error retrieving keys cryptographic services')
+            }
         }
-        throw new IllegalStateException('Error retrieving keys cryptographic services')
     }
 }
