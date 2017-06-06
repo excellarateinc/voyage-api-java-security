@@ -41,7 +41,6 @@ class UserServiceIntegrationSpec extends Specification {
         then:
             savedUser.username == 'username'
             cryptoService.hashMatches('Test@1234', savedUser.password)
-
     }
 
     def 'save - update user with weak password'() {
@@ -51,7 +50,7 @@ class UserServiceIntegrationSpec extends Specification {
             userService.saveDetached(user)
         then:
             thrown(WeakPasswordException)
-            where:
+        where:
             sno     |   password
             1       |   'test'
             2       |   'test@1234'
