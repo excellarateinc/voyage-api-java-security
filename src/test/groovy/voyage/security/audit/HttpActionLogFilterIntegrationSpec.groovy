@@ -200,7 +200,7 @@ class HttpActionLogFilterIntegrationSpec extends AuthenticatedIntegrationTest {
 
     def 'Super User POST success'() {
         given:
-            User user = new User(firstName:'Test1', lastName:'User', username:'username99', email:'test@test.com', password:'password')
+            User user = new User(firstName:'Test1', lastName:'User', username:'username99', email:'test@test.com', password:'Test@1234')
             user.phones = [new UserPhone(phoneNumber:'+1-651-888-6021', phoneType:PhoneType.MOBILE)]
             HttpHeaders headers = new HttpHeaders()
             headers.setContentType(MediaType.APPLICATION_JSON)

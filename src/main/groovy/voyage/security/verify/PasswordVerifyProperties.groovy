@@ -19,8 +19,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
 @Component
-@ConfigurationProperties(prefix='voyage.security.user-verification')
-class VerifyProperties {
+@ConfigurationProperties(prefix='voyage.security.password-verification')
+class PasswordVerifyProperties {
     String[] excludeResources
-    int verifyCodeExpiresMinutes
+    int passwordResetDays
 }

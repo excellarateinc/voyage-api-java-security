@@ -15,14 +15,12 @@
  */
 package voyage.security
 
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
 @Component
+@ConfigurationProperties(prefix='voyage.security.test.clients.standard-client')
 class StandardClient implements TestClient {
-    @Value('${voyage.security.test.clients.standard-client.client-id}')
     String clientId
-
-    @Value('${voyage.security.test.clients.standard-client.client-secret}')
     String clientSecret
 }
