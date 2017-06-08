@@ -84,6 +84,10 @@ class UserService {
         return userRepository.findAll()
     }
 
+    Iterable<User> findAllByRolesInList(@NotNull List<String> roles) {
+        return userRepository.findAllByRolesInList(roles)
+    }
+
     User saveDetached(@Valid User userIn) {
         User user
 
